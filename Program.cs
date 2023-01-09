@@ -8,4 +8,4 @@ output.Add("main:");
 output.Add($"    mov rax, {arg}");
 output.Add("    ret");
 output.Add("");
-File.WriteAllText("./Program.s", string.Join("\n", output));
+File.WriteAllText("./test.s", string.Join("\n", output));
