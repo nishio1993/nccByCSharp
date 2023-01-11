@@ -2,12 +2,12 @@ using System.Text;
 
 class Generator
 {
-    private static bool isFirstNum = true;
-    private static string lastOperand = "";
+    private static List<string> output = new List<string>();
     public static void generate(string source)
     {
-        var output = new List<string>();
         var number = new StringBuilder();
+        var isFirstNum = true;
+        var lastOperand = "";
 
         output.Add(".intel_syntax noprefix");
         output.Add(".global main");
@@ -19,28 +19,24 @@ class Generator
             } else {
                 lastOperand = character.ToString();
                 if (isFirstNum) {
-                    output.Add($"    mov rax, {number.ToString()}");
+                    add(Command.Key.MOV, Register.Key.RAX, number.ToString());
                     isFirstNum = false;
                 } else {
-                    if (character == '+') {
-                        output.Add($"    add rax, {number.ToString()}");
-                    } else if (character == '-') {
-                        output.Add($"    sub rax, {number.ToString()}");
-                    }
+                    add(Operator.Dic[character.ToString()], Register.Key.RAX, number.ToString());
                 }
                 number = new StringBuilder();
             }
         }
 
-        if (lastOperand == "+") {
-            output.Add($"    add rax, {number.ToString()}");
-        } else if (lastOperand == "-") {
-            output.Add($"    sub rax, {number.ToString()}");
-        }
-
+        add(Operator.Dic[lastOperand.ToString()], Register.Key.RAX, number.ToString());
         output.Add("    ret");
         output.Add("");
 
         File.WriteAllText("./test.s", string.Join("\n", output));
+    }
+
+    private static void add(Command.Key commandKey, Register.Key registerKey, string value)
+    {
+        output.Add($"    {Command.Dic[commandKey]} {Register.Dic[registerKey]}, {value}");
     }
 }
